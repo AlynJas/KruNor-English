@@ -28,7 +28,7 @@
             background-color: var(--denim-blue);
             color: var(--ink-black);
             overflow-x: hidden;
-           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
         }
 
         .font-handwriting { font-family: 'Caveat', cursive; }
@@ -125,7 +125,7 @@
                 <p class="font-typewriter text-sm mb-6 text-gray-600 text-center">ตั้งชื่อเล่นสำหรับ Leaderboard<br>(ไม่เกิน 20 ตัวอักษร)</p>
                 
                 <div class="bg-blue-50 p-3 rounded text-xs font-typewriter text-[--navy-blue] mb-6">
-                    💡 พิมพ์ <b class="text-red-500">Admin</b> หรือ <b class="text-red-500">Krunor</b> เพื่อเข้าสู่ระบบของครู
+                    💡 ระบบแอดมิน: ตรวจสอบสิทธิผ่าน LINE UID อัตโนมัติ
                 </div>
 
                 <input type="text" id="nicknameInput" maxlength="20" placeholder="e.g. TulipGirl" class="w-full p-4 border-2 border-[--denim-blue] rounded-xl font-typewriter mb-6 outline-none focus:ring-4 focus:ring-[--soft-pink] transition text-center shadow-inner">
@@ -133,6 +133,8 @@
                 <button onclick="app.saveNickname()" class="w-full bg-[--navy-blue] hover:bg-blue-900 text-white font-bold py-4 rounded-xl font-typewriter shadow-lg transition">
                     Save & Start ➔
                 </button>
+
+                <p id="displayUid" class="text-center text-[11px] text-gray-500 mt-6 font-typewriter break-all"></p>
             </div>
         </div>
 
@@ -163,7 +165,7 @@
                         <span class="text-lg">3️⃣</span>
                         <div><b>Post-Test:</b> เมื่อเรียนครบระบบจะปลดล็อก สอบหลังเรียนเพื่อโกยแต้มเข้า Leaderboard 🏆</div>
                     </div>
-               </div>
+                </div>
             </div>
 
             <div id="studentEmptyMsg" class="hidden text-center mt-10">
@@ -190,7 +192,7 @@
                 </div>
             </div>
 
-           <div class="torn-paper bg-white p-6 relative shadow-xl border-t-8 border-[--ink-black] mb-10">
+            <div class="torn-paper bg-white p-6 relative shadow-xl border-t-8 border-[--ink-black] mb-10">
                 <h2 id="adminFormTitle" class="text-2xl font-bold mb-4 font-inter text-[--navy-blue]">Create New Week</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <input type="number" id="adminWeekNum" placeholder="Week ID (e.g. 1)" class="w-full p-3 border-2 border-gray-200 rounded font-typewriter focus:border-[--navy-blue] outline-none">
@@ -284,6 +286,9 @@
         const LIFF_ID = "2011129012-YQ4euunQ"; // ใส่ LIFF ID จากหน้า LINE Developer
         const SUPABASE_URL = "https://cqoaxuphmetzcpmpvuga.supabase.co/rest/v1/"; // เช่น https://xxxxxxxx.supabase.co
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxb2F4dXBobWV0emNwbXB2dWdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4NTcyOTgsImV4cCI6MjEwMjQzMzI5OH0.AEqff0m8nubZ93HfneS_xVp743VRU9WHxgwjiHqJAf4"; // คีย์ยาวๆ ที่ขึ้นต้นด้วย eyJ
+        
+        // 👉 กำหนดบัญชีแอดมิน (ใส่ LINE UID ของคุณลงในเครื่องหมายคำพูด)
+        const ADMIN_UIDS = ["Uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"]; 
         // ==========================================
 
         let supabase;
@@ -297,7 +302,7 @@
             quiz: null
         };
 
-       const el = (id) => document.getElementById(id);
+        const el = (id) => document.getElementById(id);
         const switchView = (viewId) => {
             ['viewLoading', 'viewNickname', 'viewStudentDashboard', 'viewAdminDashboard', 'viewQuiz', 'viewLeaderboard'].forEach(v => {
                 el(v).classList.add('hidden-view');
@@ -336,7 +341,7 @@
         const initApp = async () => {
             try {
                 // Init Supabase
-                if(SUPABASE_URL === "YOUR_SUPABASE_URL") {
+                if(SUPABASE_URL === "https://cqoaxuphmetzcpmpvuga.supabase.co/rest/v1/") {
                     showModal("Config Error", "Please configure SUPABASE_URL and SUPABASE_ANON_KEY in the code first.");
                     return;
                 }
@@ -358,7 +363,7 @@
                     console.log("Running in local mock mode (No LIFF ID)");
                 }
 
-               await checkProfile();
+                await checkProfile();
 
             } catch (err) {
                 console.error("Init Error:", err);
@@ -372,9 +377,18 @@
 
             if (data) {
                 state.profile = data;
+                
+                // เช็กว่าถ้า LINE UID ปัจจุบัน ตรงกับที่ตั้งไว้เป็นแอดมิน ให้บังคับเปลี่ยน Role เป็น admin
+                if(ADMIN_UIDS.includes(state.userId) && state.profile.role !== 'admin') {
+                    await supabase.from('profiles').update({ role: 'admin' }).eq('uid', state.userId);
+                    state.profile.role = 'admin';
+                }
+
                 updateNav();
                 await fetchAppData();
             } else {
+                // ดึง UID ของคนๆ นั้นมาโชว์ที่หน้าตั้งชื่อ เพื่อให้คุณเอาไปใส่ในโค้ดบรรทัด ADMIN_UIDS ได้
+                el('displayUid').innerText = `Your LINE UID:\n${state.userId}`;
                 switchView('viewNickname');
             }
         };
@@ -385,8 +399,8 @@
                 return showModal("Oops!", "Please enter a valid nickname (1-20 characters).");
             }
 
-            const lower = input.toLowerCase();
-            const role = (lower === 'admin' || lower === 'krunor') ? 'admin' : 'student';
+            // ถ้า UID ตรงกับใน ADMIN_UIDS ให้เซ็ตเป็น admin อัตโนมัติ ถ้าไม่ใช่ให้เป็น student
+            const role = ADMIN_UIDS.includes(state.userId) ? 'admin' : 'student';
             
             const newProfile = {
                 uid: state.userId,
@@ -396,7 +410,15 @@
             };
 
             const { error } = await supabase.from('profiles').upsert(newProfile);
-            if(error) return showModal("Error", "Could not save profile: " + error.message);
+            if(error) {
+                console.error("Supabase Error:", error);
+                let errMsg = error.message;
+                // ตรวจจับ Error เรื่อง RLS ให้ข้อความชัดเจนขึ้น
+                if(errMsg.includes("row-level security") || error.code === '42501') {
+                    errMsg = "ติดล็อกความปลอดภัย (RLS) ของ Supabase!\n\nวิธีแก้: ไปที่เว็บ Supabase > Table Editor > คลิกตาราง profiles > มองมุมขวาบนคลิกคำว่า 'RLS is enabled' > เลือก Disable RLS";
+                }
+                return showModal("Database Error", "บันทึกไม่ได้: " + errMsg);
+            }
             
             state.profile = newProfile;
             updateNav();
@@ -515,14 +537,14 @@
 
             let html = '';
             state.weeks.forEach(week => {
-              html += `
+                html += `
                     <div class="border-2 border-gray-200 p-4 rounded-lg bg-white flex justify-between items-center shadow-sm">
                         <div>
                             <span class="font-bold font-typewriter">Week ${week.id}</span>
                             <h3 class="font-bold text-lg text-[--navy-blue]">${week.title}</h3>
                         </div>
                         <div class="flex gap-2">
-                           <button onclick="app.confirmDelete('${week.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1 rounded font-bold text-sm transition border border-red-200">
+                            <button onclick="app.confirmDelete('${week.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1 rounded font-bold text-sm transition border border-red-200">
                                 Delete
                             </button>
                         </div>
@@ -576,14 +598,14 @@
             const weekData = {
                 id: parseInt(widInput),
                 title: titleInput,
-               pre_test: demoQuestions,
+                pre_test: demoQuestions,
                 post_test: demoQuestions
             };
 
             const { error } = await supabase.from('weeks').upsert(weekData);
             if(error) return showModal("Error", error.message);
             
-          el('adminWeekNum').value = '';
+            el('adminWeekNum').value = '';
             el('adminWeekTitle').value = '';
             await fetchAppData();
             showModal("Success", `Week ${widInput} saved!`);
@@ -670,7 +692,7 @@
         const selAns = (i) => {
             state.quiz.answers[state.quiz.idx] = i;
             renderQuizQ();
-       };
+        };
 
         const submitQuiz = async () => {
             const qData = state.quiz;
@@ -712,16 +734,16 @@
                 await fetchAppData();
                 showModal("Pre-Test Done! 📝", `You scored ${score} pts. You unlocked the learning materials!`);
             }
-      };
+        };
 
-     window.app = {
+        window.app = {
             switchView, saveNickname, goHome,
             adminCreateWeek, confirmDelete, exportCSV,
             simulateLearn, startQuiz, selAns, submitQuiz,
             closeModal
         };
 
-       window.onload = initApp;
+        window.onload = initApp;
 
     </script>
 </body>
