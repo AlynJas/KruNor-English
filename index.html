@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
     <style>
         :root {
             --paper-cream: #F4F1EA;
@@ -26,8 +28,7 @@
             background-color: var(--denim-blue);
             color: var(--ink-black);
             overflow-x: hidden;
-            /* Subtle noise texture for vintage feel */
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
         }
 
         .font-handwriting { font-family: 'Caveat', cursive; }
@@ -100,7 +101,7 @@
                     <span class="font-handwriting text-3xl font-bold text-[--navy-blue] mt-1 tracking-wide">KruNor</span>
                 </div>
                 <div class="flex items-center space-x-3" id="navUserArea">
-                    <span class="font-typewriter text-sm text-gray-500">Connecting...</span>
+                    <span class="font-typewriter text-sm text-gray-500">Initializing...</span>
                 </div>
             </div>
         </div>
@@ -108,12 +109,14 @@
 
     <main class="flex-grow max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
         
+        <!-- Loading View -->
         <div id="viewLoading" class="flex flex-col items-center justify-center min-h-[60vh]">
             <div class="text-6xl float-anim mb-4">🌷</div>
             <h2 class="font-handwriting text-4xl text-white drop-shadow-md">Loading...</h2>
             <p class="font-typewriter text-white/80 mt-2" id="loadingText">Connecting to Database...</p>
         </div>
 
+        <!-- Nickname Setup View -->
         <div id="viewNickname" class="hidden-view flex flex-col items-center justify-center min-h-[60vh]">
             <div class="torn-paper bg-grid-paper w-full max-w-md p-8 sm:p-10 relative rotate-1">
                 <div class="washi-tape washi-pink w-32 -top-3 left-1/2 -translate-x-1/2 rotate-[-3deg]"></div>
@@ -122,7 +125,7 @@
                 <p class="font-typewriter text-sm mb-6 text-gray-600 text-center">ตั้งชื่อเล่นสำหรับ Leaderboard<br>(ไม่เกิน 20 ตัวอักษร)</p>
                 
                 <div class="bg-blue-50 p-3 rounded text-xs font-typewriter text-[--navy-blue] mb-6">
-                    💡 พิมพ์ <b class="text-red-500">Admin</b> หรือ <b class="text-red-500">Krunor</b> เพื่อเข้าสู่ระบบหลังบ้านของครู
+                    💡 พิมพ์ <b class="text-red-500">Admin</b> หรือ <b class="text-red-500">Krunor</b> เพื่อเข้าสู่ระบบของครู
                 </div>
 
                 <input type="text" id="nicknameInput" maxlength="20" placeholder="e.g. TulipGirl" class="w-full p-4 border-2 border-[--denim-blue] rounded-xl font-typewriter mb-6 outline-none focus:ring-4 focus:ring-[--soft-pink] transition text-center shadow-inner">
@@ -133,6 +136,7 @@
             </div>
         </div>
 
+        <!-- Student Dashboard -->
         <div id="viewStudentDashboard" class="hidden-view">
             <div class="flex justify-between items-end mb-8">
                 <h1 class="font-handwriting text-5xl sm:text-6xl font-bold text-white drop-shadow-lg">My Scrapbook 🌷</h1>
@@ -159,10 +163,7 @@
                         <span class="text-lg">3️⃣</span>
                         <div><b>Post-Test:</b> เมื่อเรียนครบระบบจะปลดล็อก สอบหลังเรียนเพื่อโกยแต้มเข้า Leaderboard 🏆</div>
                     </div>
-                    <div class="mt-2 pt-2 border-t border-yellow-300 text-xs text-yellow-700">
-                        💡 <i>ระบบมี Auto-save: หากเน็ตหลุดตอนทำข้อสอบ ระบบจะจำคำตอบล่าสุดไว้ให้เสมอ</i>
-                    </div>
-                </div>
+               </div>
             </div>
 
             <div id="studentEmptyMsg" class="hidden text-center mt-10">
@@ -175,6 +176,7 @@
             </div>
         </div>
 
+        <!-- Admin Dashboard -->
         <div id="viewAdminDashboard" class="hidden-view">
             <div class="flex justify-between items-end mb-8">
                 <h1 class="font-handwriting text-5xl sm:text-6xl font-bold text-white drop-shadow-lg">Admin Panel ⚙️</h1>
@@ -188,8 +190,7 @@
                 </div>
             </div>
 
-            <!-- Add New Week Form -->
-            <div class="torn-paper bg-white p-6 relative shadow-xl border-t-8 border-[--ink-black] mb-10">
+           <div class="torn-paper bg-white p-6 relative shadow-xl border-t-8 border-[--ink-black] mb-10">
                 <h2 id="adminFormTitle" class="text-2xl font-bold mb-4 font-inter text-[--navy-blue]">Create New Week</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <input type="number" id="adminWeekNum" placeholder="Week ID (e.g. 1)" class="w-full p-3 border-2 border-gray-200 rounded font-typewriter focus:border-[--navy-blue] outline-none">
@@ -197,10 +198,7 @@
                 </div>
                 <div class="flex gap-2 mt-4">
                     <button id="adminSubmitBtn" onclick="app.adminCreateWeek()" class="w-full bg-[--navy-blue] hover:bg-blue-900 text-white font-bold py-3 rounded shadow-md transition font-typewriter">
-                        ➕ Add Draft
-                    </button>
-                    <button id="adminCancelBtn" onclick="app.cancelEdit()" class="hidden w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 rounded shadow-md transition font-typewriter">
-                        Cancel
+                        ➕ Add Week
                     </button>
                 </div>
             </div>
@@ -211,6 +209,7 @@
             </div>
         </div>
 
+        <!-- Quiz View -->
         <div id="viewQuiz" class="hidden-view flex flex-col items-center max-w-3xl mx-auto w-full">
             <div class="w-full flex justify-between items-center mb-6 text-white drop-shadow-md">
                 <button onclick="app.goHome()" class="font-bold hover:bg-white/20 px-3 py-1 rounded transition font-typewriter">← Back</button>
@@ -234,6 +233,7 @@
             </div>
         </div>
 
+        <!-- Leaderboard View -->
         <div id="viewLeaderboard" class="hidden-view max-w-4xl mx-auto w-full">
             <div class="flex justify-between items-center mb-8">
                 <h1 class="font-handwriting text-6xl font-bold text-white drop-shadow-lg">Tier List 🏆</h1>
@@ -263,6 +263,7 @@
         </div>
     </main>
 
+    <!-- Modal System -->
     <div id="customModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm p-4">
         <div class="bg-[--paper-cream] p-8 rounded-2xl max-w-sm w-full shadow-2xl relative border-4 border-white">
             <h3 id="modalTitle" class="font-handwriting text-4xl font-bold mb-3 text-[--navy-blue]">Notice</h3>
@@ -275,34 +276,28 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 
-        // Global Setup
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'krunor-scrapbook';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        // ==========================================
+        // 🚨 CONFIGURATION - INSERT YOUR KEYS HERE!
+        // ==========================================
+        const LIFF_ID = "2011129012-YQ4euunQ"; // ใส่ LIFF ID จากหน้า LINE Developer
+        const SUPABASE_URL = "https://cqoaxuphmetzcpmpvuga.supabase.co/rest/v1/"; // เช่น https://xxxxxxxx.supabase.co
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNxb2F4dXBobWV0emNwbXB2dWdhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4NTcyOTgsImV4cCI6MjEwMjQzMzI5OH0.AEqff0m8nubZ93HfneS_xVp743VRU9WHxgwjiHqJAf4"; // คีย์ยาวๆ ที่ขึ้นต้นด้วย eyJ
+        // ==========================================
+
+        let supabase;
         
-        let app_fb, db, auth;
-        if (Object.keys(firebaseConfig).length > 0) {
-            app_fb = initializeApp(firebaseConfig);
-            db = getFirestore(app_fb);
-            auth = getAuth(app_fb);
-        }
-
-        // State Management - Maps directly to planned schema
         const state = {
             userId: null,
             profile: null,
             weeks: [],
             progress: {},
-            profilesList: [], // For Leaderboard
-            quiz: null,
-            editWeekId: null // New state for admin editing
+            profilesList: [], 
+            quiz: null
         };
 
-        // UI Helpers
-        const el = (id) => document.getElementById(id);
+       const el = (id) => document.getElementById(id);
         const switchView = (viewId) => {
             ['viewLoading', 'viewNickname', 'viewStudentDashboard', 'viewAdminDashboard', 'viewQuiz', 'viewLeaderboard'].forEach(v => {
                 el(v).classList.add('hidden-view');
@@ -339,36 +334,46 @@
         };
 
         const initApp = async () => {
-            if(!auth) {
-                showModal("Configuration Missing", "Firebase configuration is not loaded properly.");
-                return;
-            }
-
             try {
-                const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                if (token) {
-                    await signInWithCustomToken(auth, token);
+                // Init Supabase
+                if(SUPABASE_URL === "YOUR_SUPABASE_URL") {
+                    showModal("Config Error", "Please configure SUPABASE_URL and SUPABASE_ANON_KEY in the code first.");
+                    return;
+                }
+                supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+                // Init LIFF
+                el('loadingText').innerText = "Connecting to LINE...";
+                if(LIFF_ID !== "YOUR_LIFF_ID") {
+                    await liff.init({ liffId: LIFF_ID });
+                    if (!liff.isLoggedIn()) {
+                        liff.login();
+                        return;
+                    }
+                    const profile = await liff.getProfile();
+                    state.userId = profile.userId;
                 } else {
-                    await signInAnonymously(auth);
+                    // Fallback for local testing without LIFF
+                    state.userId = "test_user_001"; 
+                    console.log("Running in local mock mode (No LIFF ID)");
                 }
 
-                state.userId = auth.currentUser.uid;
-                await checkProfile();
+               await checkProfile();
 
             } catch (err) {
-                console.error("Auth Error:", err);
-                showModal("Authentication Error", "Could not sign in to database.");
+                console.error("Init Error:", err);
+                showModal("System Error", "Could not connect to the system. " + err.message);
             }
         };
 
         const checkProfile = async () => {
-            const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', state.userId);
-            const docSnap = await getDoc(profileRef);
+            el('loadingText').innerText = "Loading Profile...";
+            const { data, error } = await supabase.from('profiles').select('*').eq('uid', state.userId).single();
 
-            if (docSnap.exists()) {
-                state.profile = docSnap.data();
+            if (data) {
+                state.profile = data;
                 updateNav();
-                setupDataListeners();
+                await fetchAppData();
             } else {
                 switchView('viewNickname');
             }
@@ -390,12 +395,12 @@
                 role: role
             };
 
-            const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', state.userId);
-            await setDoc(profileRef, newProfile);
+            const { error } = await supabase.from('profiles').upsert(newProfile);
+            if(error) return showModal("Error", "Could not save profile: " + error.message);
             
             state.profile = newProfile;
             updateNav();
-            setupDataListeners();
+            await fetchAppData();
         };
 
         const updateNav = () => {
@@ -408,50 +413,28 @@
             `;
         };
 
-        const setupDataListeners = () => {
-            if(!state.userId) return;
+        const fetchAppData = async () => {
+            el('loadingText').innerText = "Loading Challenges...";
+            
+            // 1. Fetch Weeks
+            const { data: wData } = await supabase.from('weeks').select('*').order('id', { ascending: true });
+            state.weeks = wData || [];
 
-            // 1. Listen to Weeks
-            const weeksRef = collection(db, 'artifacts', appId, 'public', 'data', 'weeks');
-            onSnapshot(weeksRef, (snapshot) => {
-                state.weeks = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    // Safely parse JSON strings back to arrays
-                    state.weeks.push({
-                        ...data,
-                        pre_test: typeof data.pre_test === 'string' ? JSON.parse(data.pre_test) : data.pre_test,
-                        post_test: typeof data.post_test === 'string' ? JSON.parse(data.post_test) : data.post_test
-                    });
-                });
-                state.weeks.sort((a, b) => a.id - b.id);
-                renderDashboards();
-            }, (err) => console.error(err));
-
-            // 2. Listen to Progress (if student)
+            // 2. Fetch Progress (if student)
             if(state.profile.role === 'student') {
-                const progRef = collection(db, 'artifacts', appId, 'users', state.userId, 'progress');
-                onSnapshot(progRef, (snapshot) => {
-                    state.progress = {};
-                    snapshot.forEach(doc => {
-                        state.progress[doc.id] = doc.data();
-                    });
-                    renderDashboards();
-                }, (err) => console.error(err));
+                const { data: pData } = await supabase.from('progress').select('*').eq('uid', state.userId);
+                state.progress = {};
+                (pData || []).forEach(p => {
+                    state.progress[p.week_id] = p;
+                });
             }
 
-            // 3. Listen to Profiles (for Leaderboard)
-            const profRef = collection(db, 'artifacts', appId, 'public', 'data', 'profiles');
-            onSnapshot(profRef, (snapshot) => {
-                state.profilesList = [];
-                snapshot.forEach(doc => {
-                    const p = doc.data();
-                    if(p.role === 'student') state.profilesList.push(p);
-                });
-                state.profilesList.sort((a, b) => b.total_score - a.total_score);
-                renderLeaderboard();
-            }, (err) => console.error(err));
+            // 3. Fetch Leaderboard
+            const { data: profData } = await supabase.from('profiles').select('*').eq('role', 'student').order('total_score', { ascending: false }).limit(50);
+            state.profilesList = profData || [];
 
+            renderDashboards();
+            renderLeaderboard();
             goHome();
         };
 
@@ -465,9 +448,7 @@
 
         const renderStudentView = () => {
             const container = el('studentWeeksContainer');
-            const published = state.weeks.filter(w => w.is_published);
-
-            if(published.length === 0) {
+            if(state.weeks.length === 0) {
                 el('studentEmptyMsg').classList.remove('hidden');
                 container.innerHTML = '';
                 return;
@@ -475,18 +456,20 @@
             el('studentEmptyMsg').classList.add('hidden');
 
             let html = '';
-            published.forEach(week => {
+            state.weeks.forEach(week => {
                 const wid = week.id;
                 const p = state.progress[wid] || { pre_test_done: false, post_test_done: false, pre_test_score: 0, post_test_score: 0, learned: false };
 
                 const preDone = p.pre_test_done;
                 const postDone = p.post_test_done;
-                // Feature: Unlock Post-test requires Pre-test done AND "Learned"
-                const canPost = preDone && p.learned && !postDone;
+                
+                // Logic: Must complete Pre-test to learn, must learn to unlock Post-test
+                const learned = p.learned || false;
+                const canPost = preDone && learned && !postDone;
 
                 const preBtn = preDone ? `<span class="text-green-600 font-bold text-sm">✅ Done (${p.pre_test_score} pts)</span>` : `<button onclick="app.startQuiz('${wid}', 'pre')" class="w-full bg-[--denim-blue] hover:bg-blue-300 text-[--ink-black] py-2 rounded font-typewriter font-bold shadow text-sm">Start Pre-Test</button>`;
                 
-                const learnBtn = !preDone ? `<span class="text-gray-400 text-sm">🔒 Locked</span>` : (p.learned ? `<span class="text-green-600 font-bold text-sm">✅ Learned</span>` : `<button onclick="app.simulateLearn('${wid}')" class="w-full bg-[--pastel-yellow] hover:bg-yellow-300 text-yellow-900 py-2 rounded font-typewriter font-bold shadow text-sm">Simulate 5-Day Learn</button>`);
+                const learnBtn = !preDone ? `<span class="text-gray-400 text-sm">🔒 Locked</span>` : (learned ? `<span class="text-green-600 font-bold text-sm">✅ Learned</span>` : `<button onclick="app.simulateLearn('${wid}')" class="w-full bg-[--pastel-yellow] hover:bg-yellow-300 text-yellow-900 py-2 rounded font-typewriter font-bold shadow text-sm">Simulate 5-Day Learn</button>`);
 
                 const postBtn = postDone ? `<span class="text-green-600 font-bold text-sm">✅ Done (${p.post_test_score} pts)</span>` : (canPost ? `<button onclick="app.startQuiz('${wid}', 'post')" class="w-full bg-[--soft-pink] hover:bg-pink-300 text-[--ink-black] py-2 rounded font-typewriter font-bold shadow text-sm">Start Post-Test</button>` : `<span class="text-gray-400 text-sm">🔒 Need Learning</span>`);
 
@@ -497,15 +480,15 @@
                             <h2 class="font-handwriting text-3xl font-bold text-[--navy-blue]">${week.title}</h2>
                         </div>
                         <div class="grid grid-cols-3 gap-3">
-                            <div class="border border-gray-200 p-3 rounded bg-gray-50 text-center">
+                            <div class="border border-gray-200 p-3 rounded bg-gray-50 text-center flex flex-col justify-between">
                                 <h3 class="font-bold text-xs mb-2">1. Pre-Test</h3>
                                 ${preBtn}
                             </div>
-                            <div class="border border-gray-200 p-3 rounded bg-gray-50 text-center">
+                            <div class="border border-gray-200 p-3 rounded bg-gray-50 text-center flex flex-col justify-between">
                                 <h3 class="font-bold text-xs mb-2">2. Learn</h3>
                                 ${learnBtn}
                             </div>
-                            <div class="border border-gray-200 p-3 rounded bg-gray-50 text-center">
+                            <div class="border border-gray-200 p-3 rounded bg-gray-50 text-center flex flex-col justify-between">
                                 <h3 class="font-bold text-xs mb-2">3. Post-Test</h3>
                                 ${postBtn}
                             </div>
@@ -517,8 +500,9 @@
         };
 
         const simulateLearn = async (wid) => {
-            const progRef = doc(db, 'artifacts', appId, 'users', state.userId, 'progress', wid);
-            await setDoc(progRef, { learned: true, week_id: wid }, { merge: true });
+            const updateObj = { uid: state.userId, week_id: wid, learned: true };
+            await supabase.from('progress').upsert(updateObj);
+            await fetchAppData(); // Refresh UI
             showModal("Good Job! 🎉", "Simulated 5-day learning completed. You can now take the Post-Test.");
         };
 
@@ -531,28 +515,14 @@
 
             let html = '';
             state.weeks.forEach(week => {
-                const statusBadge = week.is_published ? `<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-bold">Published</span>` : `<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded font-bold">Draft</span>`;
-                const toggleBtnTxt = week.is_published ? 'Unpublish' : 'Publish';
-                const preTestCount = week.pre_test_count || 0;
-                
-                html += `
+              html += `
                     <div class="border-2 border-gray-200 p-4 rounded-lg bg-white flex justify-between items-center shadow-sm">
                         <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="font-bold font-typewriter">Week ${week.id}</span>
-                                ${statusBadge}
-                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-bold ml-2">👥 Pre-Test Count: ${preTestCount}</span>
-                            </div>
+                            <span class="font-bold font-typewriter">Week ${week.id}</span>
                             <h3 class="font-bold text-lg text-[--navy-blue]">${week.title}</h3>
                         </div>
                         <div class="flex gap-2">
-                            <button onclick="app.editWeek('${week.id}')" class="bg-yellow-50 hover:bg-yellow-100 text-yellow-700 px-3 py-1 rounded font-bold text-sm transition border border-yellow-200">
-                                Edit
-                            </button>
-                            <button onclick="app.togglePublish('${week.id}', ${!week.is_published})" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-1 rounded font-bold text-sm transition border border-gray-300">
-                                ${toggleBtnTxt}
-                            </button>
-                            <button onclick="app.confirmDelete('${week.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1 rounded font-bold text-sm transition border border-red-200">
+                           <button onclick="app.confirmDelete('${week.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1 rounded font-bold text-sm transition border border-red-200">
                                 Delete
                             </button>
                         </div>
@@ -570,7 +540,7 @@
             }
 
             let html = '';
-            state.profilesList.slice(0, 50).forEach((p, index) => {
+            state.profilesList.forEach((p, index) => {
                 const rank = index + 1;
                 let rankIcon = rank;
                 if(rank === 1) rankIcon = '🥇 S Tier';
@@ -582,7 +552,7 @@
 
                 html += `
                     <tr class="${rowClass} transition">
-                        <td class="p-4 font-bold text-gray-600 text-center">${rankIcon}</td>
+                        <td class="p-4 font-bold text-gray-600 text-center whitespace-nowrap">${rankIcon}</td>
                         <td class="p-4 font-typewriter text-lg">${p.nickname} ${isMe ? '(You)' : ''}</td>
                         <td class="p-4 text-right font-bold text-[--sage-green] text-xl">${p.total_score || 0} pts</td>
                     </tr>
@@ -597,60 +567,32 @@
             
             if(!widInput || !titleInput) return showModal("Error", "Please fill all fields.");
 
-            // Demo Questions (must be stringified for Firestore to avoid nested array issues)
-            const demoQuestions = JSON.stringify([
+            // Demo Questions for quick generation
+            const demoQuestions = [
                 { q: "What does 'Stan' mean?", opts: ["Fan", "Hater", "Shoe"], ans: 0 },
                 { q: "US: Sneakers, UK: ______", opts: ["Trainers", "Boots", "Jumpers"], ans: 0 }
-            ]);
+            ];
 
             const weekData = {
                 id: parseInt(widInput),
                 title: titleInput,
-                is_published: state.editWeekId ? (state.weeks.find(w => w.id == widInput)?.is_published || false) : false,
-                pre_test: demoQuestions,
-                post_test: demoQuestions,
-                pre_test_count: state.editWeekId ? (state.weeks.find(w => w.id == widInput)?.pre_test_count || 0) : 0
+               pre_test: demoQuestions,
+                post_test: demoQuestions
             };
 
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'weeks', widInput);
-            await setDoc(docRef, weekData, { merge: true });
+            const { error } = await supabase.from('weeks').upsert(weekData);
+            if(error) return showModal("Error", error.message);
             
-            app.cancelEdit();
-            showModal("Success", `Draft for Week ${widInput} saved!`);
-        };
-
-        const editWeek = (wid) => {
-            const week = state.weeks.find(w => String(w.id) === String(wid));
-            if(!week) return;
-            state.editWeekId = wid;
-            el('adminFormTitle').innerText = `Edit Week ${wid}`;
-            el('adminWeekNum').value = week.id;
-            el('adminWeekNum').disabled = true; // Prevent changing ID
-            el('adminWeekTitle').value = week.title;
-            el('adminSubmitBtn').innerText = "💾 Save Changes";
-            el('adminCancelBtn').classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        };
-
-        const cancelEdit = () => {
-            state.editWeekId = null;
-            el('adminFormTitle').innerText = `Create New Week`;
-            el('adminWeekNum').value = '';
-            el('adminWeekNum').disabled = false;
+          el('adminWeekNum').value = '';
             el('adminWeekTitle').value = '';
-            el('adminSubmitBtn').innerText = "➕ Add Draft";
-            el('adminCancelBtn').classList.add('hidden');
-        };
-
-        const togglePublish = async (wid, isPub) => {
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'weeks', wid);
-            await updateDoc(docRef, { is_published: isPub });
+            await fetchAppData();
+            showModal("Success", `Week ${widInput} saved!`);
         };
 
         const confirmDelete = (wid) => {
             showModal("Confirm Delete", `Are you sure you want to delete Week ${wid}?`, true, async () => {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'weeks', wid);
-                await deleteDoc(docRef);
+                await supabase.from('weeks').delete().eq('id', wid);
+                await fetchAppData();
             });
         };
 
@@ -676,21 +618,14 @@
             if(!week) return;
 
             const qList = type === 'pre' ? week.pre_test : week.post_test;
-            if(!qList || qList.length === 0) return showModal("Error", "No questions.");
-
-            // Data Persistence: Load Checkpoint if exists
-            let savedAnswers = new Array(qList.length).fill(null);
-            const p = state.progress[wid];
-            if(p && p[`${type}_temp_answers`]) {
-                savedAnswers = p[`${type}_temp_answers`];
-            }
+            if(!qList || qList.length === 0) return showModal("Error", "No questions available.");
 
             state.quiz = {
                 wid: wid,
                 type: type,
                 questions: qList,
                 idx: 0,
-                answers: savedAnswers
+                answers: new Array(qList.length).fill(null)
             };
 
             el('quizTitle').innerText = `${type === 'pre' ? 'Pre-Test' : 'Post-Test'}: Wk ${wid}`;
@@ -732,16 +667,10 @@
             }
         };
 
-        const selAns = async (i) => {
+        const selAns = (i) => {
             state.quiz.answers[state.quiz.idx] = i;
             renderQuizQ();
-
-            // Data Persistence: Auto-save checkpoint to cloud
-            const progRef = doc(db, 'artifacts', appId, 'users', state.userId, 'progress', state.quiz.wid);
-            const updateObj = { week_id: state.quiz.wid };
-            updateObj[`${state.quiz.type}_temp_answers`] = state.quiz.answers;
-            await setDoc(progRef, updateObj, { merge: true });
-        };
+       };
 
         const submitQuiz = async () => {
             const qData = state.quiz;
@@ -753,15 +682,12 @@
                 return;
             }
 
-            // Calculate
+            // Calculate score
             let score = 0;
             qData.questions.forEach((q, i) => { if(qData.answers[i] === q.ans) score += 10; });
 
             const isPre = qData.type === 'pre';
-            const progRef = doc(db, 'artifacts', appId, 'users', state.userId, 'progress', qData.wid);
-            
-            const updateObj = { week_id: qData.wid };
-            updateObj[`${qData.type}_temp_answers`] = null; // Clear checkpoint after submit
+            const updateObj = { uid: state.userId, week_id: qData.wid };
 
             if(isPre) {
                 updateObj.pre_test_done = true;
@@ -771,41 +697,32 @@
                 updateObj.post_test_score = score;
             }
 
-            // Update Progress
-            await setDoc(progRef, updateObj, { merge: true });
-
-            // Admin Stats: Update Pre-Test Count for Dashboard
-            if (isPre) {
-                const weekRef = doc(db, 'artifacts', appId, 'public', 'data', 'weeks', qData.wid);
-                const weekData = state.weeks.find(w => String(w.id) === String(qData.wid));
-                const currentCount = weekData.pre_test_count || 0;
-                await updateDoc(weekRef, { pre_test_count: currentCount + 1 });
-            }
+            // Save Progress to Supabase
+            await supabase.from('progress').upsert(updateObj);
 
             // Update Total Score if Post-test
             if(!isPre) {
                 const newTotal = state.profile.total_score + score;
-                const profRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', state.userId);
-                await updateDoc(profRef, { total_score: newTotal });
-                showModal("Amazing! 🎉", `You scored ${score} pts! Ranked updated.`);
+                await supabase.from('profiles').update({ total_score: newTotal }).eq('uid', state.userId);
+                state.profile.total_score = newTotal;
+                updateNav();
+                await fetchAppData();
+                showModal("Amazing! 🎉", `You scored ${score} pts! Rank updated.`);
             } else {
-                showModal("Pre-Test Done! 📝", `You scored ${score} pts. Check LINE for daily vocabs!`);
+                await fetchAppData();
+                showModal("Pre-Test Done! 📝", `You scored ${score} pts. You unlocked the learning materials!`);
             }
+      };
 
-            goHome();
-        };
-
-        // Window Exports
-        window.app = {
+     window.app = {
             switchView, saveNickname, goHome,
-            adminCreateWeek, editWeek, cancelEdit, togglePublish, confirmDelete, exportCSV,
+            adminCreateWeek, confirmDelete, exportCSV,
             simulateLearn, startQuiz, selAns, submitQuiz,
             closeModal
         };
 
-        // Boot
-        window.onload = initApp;
+       window.onload = initApp;
 
     </script>
 </body>
-</html> 
+</html>
