@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KruNor - English Scrapbook</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        :root {
+            --paper-cream: #F4F1EA;
+            --denim-blue: #A9C2D9;
+            --soft-pink: #F9D6D6;
+            --sage-green: #8A9A86;
+            --ink-black: #2C2A29;
+            --navy-blue: #1A365D;
+            --pastel-yellow: #FEF08A;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--denim-blue);
+            color: var(--ink-black);
+            overflow-x: hidden;
+            /* Subtle noise texture for vintage feel */
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+        }
+
+        .font-handwriting { font-family: 'Caveat', cursive; }
+        .font-typewriter { font-family: 'Courier Prime', monospace; }
+        
+        .bg-grid-paper {
+            background-color: var(--paper-cream);
+            background-image: 
+                linear-gradient(#e5e1d8 1px, transparent 1px), 
+                linear-gradient(90deg, #e5e1d8 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .torn-paper {
+            position: relative;
+            background: var(--paper-cream);
+            box-shadow: 3px 3px 15px rgba(0,0,0,0.08);
+            border-radius: 2px;
+        }
+        
+        .torn-paper::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: inherit;
+            clip-path: polygon(0% 0%, 5% 100%, 10% 0%, 15% 100%, 20% 0%, 25% 100%, 30% 0%, 35% 100%, 40% 0%, 45% 100%, 50% 0%, 55% 100%, 60% 0%, 65% 100%, 70% 0%, 75% 100%, 80% 0%, 85% 100%, 90% 0%, 95% 100%, 100% 0%);
+        }
+
+        .washi-tape {
+            background-color: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(2px);
+            border: 1px solid rgba(0,0,0,0.03);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: 28px;
+            position: absolute;
+            z-index: 10;
+        }
+        .washi-pink { background-color: rgba(249, 214, 214, 0.7); }
+        .washi-blue { background-color: rgba(169, 194, 217, 0.7); }
+        .washi-green { background-color: rgba(138, 154, 134, 0.6); }
+
+        .hidden-view { display: none !important; }
+        
+        input[type="radio"] {
+            accent-color: var(--soft-pink);
+            width: 1.25rem; height: 1.25rem;
+            cursor: pointer;
+        }
+
+        .float-anim {
+            animation: floating 3s ease-in-out infinite;
+        }
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col relative text-[--ink-black]">
+
+    <nav class="bg-[--paper-cream] shadow-md border-b-4 border-dashed border-white relative z-20 sticky top-0">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center cursor-pointer" onclick="app.goHome()">
+                    <span class="text-2xl mr-2 float-anim">🌷</span>
+                    <span class="font-handwriting text-3xl font-bold text-[--navy-blue] mt-1 tracking-wide">KruNor</span>
+                </div>
+                <div class="flex items-center space-x-3" id="navUserArea">
+                    <span class="font-typewriter text-sm text-gray-500">Connecting...</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8 relative z-10">
+        
+        <div id="viewLoading" class="flex flex-col items-center justify-center min-h-[60vh]">
+            <div class="text-6xl float-anim mb-4">🌷</div>
+            <h2 class="font-handwriting text-4xl text-white drop-shadow-md">Loading...</h2>
+            <p class="font-typewriter text-white/80 mt-2" id="loadingText">Connecting to Database...</p>
+        </div>
+
+        <div id="viewNickname" class="hidden-view flex flex-col items-center justify-center min-h-[60vh]">
+            <div class="torn-paper bg-grid-paper w-full max-w-md p-8 sm:p-10 relative rotate-1">
+                <div class="washi-tape washi-pink w-32 -top-3 left-1/2 -translate-x-1/2 rotate-[-3deg]"></div>
+                
+                <h1 class="font-handwriting text-5xl font-bold mb-2 text-[--navy-blue] text-center">Welcome!</h1>
+                <p class="font-typewriter text-sm mb-6 text-gray-600 text-center">ตั้งชื่อเล่นสำหรับ Leaderboard<br>(ไม่เกิน 20 ตัวอักษร)</p>
+                
+                <div class="bg-blue-50 p-3 rounded text-xs font-typewriter text-[--navy-blue] mb-6">
+                    💡 พิมพ์ <b class="text-red-500">Admin</b> หรือ <b class="text-red-500">Krunor</b> เพื่อเข้าสู่ระบบหลังบ้านของครู
+                </div>
+
+                <input type="text" id="nicknameInput" maxlength="20" placeholder="e.g. TulipGirl" class="w-full p-4 border-2 border-[--denim-blue] rounded-xl font-typewriter mb-6 outline-none focus:ring-4 focus:ring-[--soft-pink] transition text-center shadow-inner">
+                
+                <button onclick="app.saveNickname()" class="w-full bg-[--navy-blue] hover:bg-blue-900 text-white font-bold py-4 rounded-xl font-typewriter shadow-lg transition">
+                    Save & Start ➔
+                </button>
+            </div>
+        </div>
+
+        <div id="viewStudentDashboard" class="hidden-view">
+            <div class="flex justify-between items-end mb-8">
+                <h1 class="font-handwriting text-5xl sm:text-6xl font-bold text-white drop-shadow-lg">My Scrapbook 🌷</h1>
+                <button onclick="app.switchView('viewLeaderboard')" class="bg-[--paper-cream] text-[--navy-blue] px-5 py-2 rounded-full font-bold shadow-lg hover:bg-white transition border-2 border-white flex items-center gap-2">
+                    🏆 Tier List
+                </button>
+            </div>
+
+            <!-- Guideline Sticky Note -->
+            <div class="bg-[--pastel-yellow] p-6 rounded-sm shadow-md rotate-[-1deg] mb-10 relative max-w-2xl mx-auto border border-yellow-200">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-8 bg-red-400/20 backdrop-blur-sm shadow-sm rotate-2"></div>
+                <h3 class="font-handwriting text-3xl font-bold text-yellow-800 mb-3">📌 Student Guideline</h3>
+                <div class="font-typewriter text-sm text-yellow-900 space-y-3">
+                    <p class="mb-2">ทำตาม Step นี้เพื่อปลดล็อกบทเรียนและสะสมคะแนน!</p>
+                    <div class="flex items-start gap-2">
+                        <span class="text-lg">1️⃣</span>
+                        <div><b>Pre-Test:</b> ทำแบบทดสอบก่อนเรียนเพื่อปลดล็อกบทเรียน (ห้ามข้ามระบบจะล็อกไว้!)</div>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <span class="text-lg">2️⃣</span>
+                        <div><b>Learn & Check-in:</b> เข้ามาเรียนศัพท์และเล่นควิซทุกวัน (กด Simulate 5-Day)</div>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <span class="text-lg">3️⃣</span>
+                        <div><b>Post-Test:</b> เมื่อเรียนครบระบบจะปลดล็อก สอบหลังเรียนเพื่อโกยแต้มเข้า Leaderboard 🏆</div>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-yellow-300 text-xs text-yellow-700">
+                        💡 <i>ระบบมี Auto-save: หากเน็ตหลุดตอนทำข้อสอบ ระบบจะจำคำตอบล่าสุดไว้ให้เสมอ</i>
+                    </div>
+                </div>
+            </div>
+
+            <div id="studentEmptyMsg" class="hidden text-center mt-10">
+                <p class="font-handwriting text-4xl text-white drop-shadow-md">No challenges published yet.</p>
+                <p class="font-typewriter text-white mt-2">Waiting for KruNor... ⏳</p>
+            </div>
+
+            <div id="studentWeeksContainer" class="space-y-8">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <div id="viewAdminDashboard" class="hidden-view">
+            <div class="flex justify-between items-end mb-8">
+                <h1 class="font-handwriting text-5xl sm:text-6xl font-bold text-white drop-shadow-lg">Admin Panel ⚙️</h1>
+                <div class="flex gap-2">
+                    <button onclick="app.exportCSV()" class="bg-green-600 text-white px-4 py-2 rounded font-bold shadow transition text-sm">
+                        📥 Export CSV
+                    </button>
+                    <button onclick="app.switchView('viewLeaderboard')" class="bg-white text-[--navy-blue] px-4 py-2 rounded font-bold shadow transition text-sm">
+                        🏆 Tier List
+                    </button>
+                </div>
+            </div>
+
+            <!-- Add New Week Form -->
+            <div class="torn-paper bg-white p-6 relative shadow-xl border-t-8 border-[--ink-black] mb-10">
+                <h2 id="adminFormTitle" class="text-2xl font-bold mb-4 font-inter text-[--navy-blue]">Create New Week</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <input type="number" id="adminWeekNum" placeholder="Week ID (e.g. 1)" class="w-full p-3 border-2 border-gray-200 rounded font-typewriter focus:border-[--navy-blue] outline-none">
+                    <input type="text" id="adminWeekTitle" placeholder="Theme Title" class="w-full p-3 border-2 border-gray-200 rounded font-typewriter focus:border-[--navy-blue] outline-none sm:col-span-2">
+                </div>
+                <div class="flex gap-2 mt-4">
+                    <button id="adminSubmitBtn" onclick="app.adminCreateWeek()" class="w-full bg-[--navy-blue] hover:bg-blue-900 text-white font-bold py-3 rounded shadow-md transition font-typewriter">
+                        ➕ Add Draft
+                    </button>
+                    <button id="adminCancelBtn" onclick="app.cancelEdit()" class="hidden w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-3 rounded shadow-md transition font-typewriter">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+
+            <h3 class="font-handwriting text-3xl font-bold text-white drop-shadow-md mb-4">Manage Weeks</h3>
+            <div id="adminWeeksContainer" class="space-y-4">
+                <!-- Injected via JS -->
+            </div>
+        </div>
+
+        <div id="viewQuiz" class="hidden-view flex flex-col items-center max-w-3xl mx-auto w-full">
+            <div class="w-full flex justify-between items-center mb-6 text-white drop-shadow-md">
+                <button onclick="app.goHome()" class="font-bold hover:bg-white/20 px-3 py-1 rounded transition font-typewriter">← Back</button>
+                <h2 id="quizTitle" class="font-handwriting text-4xl font-bold">Quiz</h2>
+                <div id="quizProgress" class="font-typewriter bg-white/20 px-3 py-1 rounded">1/5</div>
+            </div>
+            
+            <div class="torn-paper bg-grid-paper w-full p-6 sm:p-10 relative">
+                <div class="washi-tape washi-green w-32 -top-3 right-8 rotate-[3deg]"></div>
+
+                <div id="quizContent" class="min-h-[200px]">
+                    <!-- Questions injected here -->
+                </div>
+
+                <div class="mt-8 flex justify-between items-center border-t-2 border-dashed border-[--denim-blue] pt-6">
+                    <span class="font-typewriter text-xs text-gray-500" id="quizHint">Select an answer to continue.</span>
+                    <button id="submitQuizBtn" onclick="app.submitQuiz()" class="bg-[--navy-blue] hover:bg-blue-900 text-white px-8 py-3 rounded-lg font-typewriter font-bold shadow-md transition">
+                        Next ➔
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="viewLeaderboard" class="hidden-view max-w-4xl mx-auto w-full">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="font-handwriting text-6xl font-bold text-white drop-shadow-lg">Tier List 🏆</h1>
+                <button onclick="app.goHome()" class="bg-[--paper-cream] px-5 py-2.5 rounded-full font-bold shadow-lg border-2 border-white hover:bg-white transition flex items-center gap-2">
+                    🏠 Home
+                </button>
+            </div>
+
+            <div class="torn-paper bg-white p-2 sm:p-6 relative shadow-xl">
+                <div class="washi-tape washi-blue w-24 -top-3 left-10 rotate-[-2deg]"></div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="font-typewriter text-gray-500 border-b-2 border-dashed border-[--denim-blue] bg-gray-50">
+                                <th class="p-4 font-semibold text-center w-20">Rank</th>
+                                <th class="p-4 font-semibold">Nickname</th>
+                                <th class="p-4 font-semibold text-right">Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody" class="font-inter">
+                            <!-- Injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="customModal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center backdrop-blur-sm p-4">
+        <div class="bg-[--paper-cream] p-8 rounded-2xl max-w-sm w-full shadow-2xl relative border-4 border-white">
+            <h3 id="modalTitle" class="font-handwriting text-4xl font-bold mb-3 text-[--navy-blue]">Notice</h3>
+            <p id="modalMessage" class="font-inter text-gray-700 mb-8 leading-relaxed"></p>
+            <div class="flex gap-2">
+                <button id="modalConfirmBtn" onclick="app.closeModal()" class="w-full bg-[--navy-blue] text-white font-bold py-3 rounded-xl shadow transition font-typewriter">OK</button>
+                <button id="modalCancelBtn" onclick="app.closeModal()" class="hidden w-full bg-gray-300 text-gray-800 font-bold py-3 rounded-xl shadow transition font-typewriter">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Setup
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'krunor-scrapbook';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        
+        let app_fb, db, auth;
+        if (Object.keys(firebaseConfig).length > 0) {
+            app_fb = initializeApp(firebaseConfig);
+            db = getFirestore(app_fb);
+            auth = getAuth(app_fb);
+        }
+
+        // State Management - Maps directly to planned schema
+        const state = {
+            userId: null,
+            profile: null,
+            weeks: [],
+            progress: {},
+            profilesList: [], // For Leaderboard
+            quiz: null,
+            editWeekId: null // New state for admin editing
+        };
+
+        // UI Helpers
+        const el = (id) => document.getElementById(id);
+        const switchView = (viewId) => {
+            ['viewLoading', 'viewNickname', 'viewStudentDashboard', 'viewAdminDashboard', 'viewQuiz', 'viewLeaderboard'].forEach(v => {
+                el(v).classList.add('hidden-view');
+            });
+            el(viewId).classList.remove('hidden-view');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        let modalCallback = null;
+        const showModal = (title, msg, isConfirm = false, callback = null) => {
+            el('modalTitle').innerText = title;
+            el('modalMessage').innerText = msg;
+            modalCallback = callback;
+            
+            if(isConfirm) {
+                el('modalCancelBtn').classList.remove('hidden');
+            } else {
+                el('modalCancelBtn').classList.add('hidden');
+            }
+            el('customModal').classList.remove('hidden');
+        };
+        const closeModal = () => {
+            el('customModal').classList.add('hidden');
+            if(modalCallback) {
+                modalCallback();
+                modalCallback = null;
+            }
+        };
+
+        const goHome = () => {
+            if(!state.profile) return;
+            if(state.profile.role === 'admin') switchView('viewAdminDashboard');
+            else switchView('viewStudentDashboard');
+        };
+
+        const initApp = async () => {
+            if(!auth) {
+                showModal("Configuration Missing", "Firebase configuration is not loaded properly.");
+                return;
+            }
+
+            try {
+                const token = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+                if (token) {
+                    await signInWithCustomToken(auth, token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                state.userId = auth.currentUser.uid;
+                await checkProfile();
+
+            } catch (err) {
+                console.error("Auth Error:", err);
+                showModal("Authentication Error", "Could not sign in to database.");
+            }
+        };
+
+        const checkProfile = async () => {
+            const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', state.userId);
+            const docSnap = await getDoc(profileRef);
+
+            if (docSnap.exists()) {
+                state.profile = docSnap.data();
+                updateNav();
+                setupDataListeners();
+            } else {
+                switchView('viewNickname');
+            }
+        };
+
+        const saveNickname = async () => {
+            const input = el('nicknameInput').value.trim();
+            if (!input || input.length > 20) {
+                return showModal("Oops!", "Please enter a valid nickname (1-20 characters).");
+            }
+
+            const lower = input.toLowerCase();
+            const role = (lower === 'admin' || lower === 'krunor') ? 'admin' : 'student';
+            
+            const newProfile = {
+                uid: state.userId,
+                nickname: input,
+                total_score: 0,
+                role: role
+            };
+
+            const profileRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', state.userId);
+            await setDoc(profileRef, newProfile);
+            
+            state.profile = newProfile;
+            updateNav();
+            setupDataListeners();
+        };
+
+        const updateNav = () => {
+            if(!state.profile) return;
+            el('navUserArea').innerHTML = `
+                <div class="bg-white px-3 py-1.5 rounded-full shadow-sm border border-gray-200 flex items-center gap-2">
+                    <span class="font-typewriter text-xs font-bold text-[--navy-blue]">${state.profile.nickname}</span>
+                    ${state.profile.role === 'student' ? `<span class="text-xs bg-[--soft-pink] px-2 py-0.5 rounded text-[--ink-black] font-bold">⭐ ${state.profile.total_score}</span>` : `<span class="text-xs bg-red-200 px-2 py-0.5 rounded text-red-800 font-bold">ADMIN</span>`}
+                </div>
+            `;
+        };
+
+        const setupDataListeners = () => {
+            if(!state.userId) return;
+
+            // 1. Listen to Weeks
+            const weeksRef = collection(db, 'artifacts', appId, 'public', 'data', 'weeks');
+            onSnapshot(weeksRef, (snapshot) => {
+                state.weeks = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    // Safely parse JSON strings back to arrays
+                    state.weeks.push({
+                        ...data,
+                        pre_test: typeof data.pre_test === 'string' ? JSON.parse(data.pre_test) : data.pre_test,
+                        post_test: typeof data.post_test === 'string' ? JSON.parse(data.post_test) : data.post_test
+                    });
+                });
+                state.weeks.sort((a, b) => a.id - b.id);
+                renderDashboards();
+            }, (err) => console.error(err));
+
+            // 2. Listen to Progress (if student)
+            if(state.profile.role === 'student') {
+                const progRef = collection(db, 'artifacts', appId, 'users', state.userId, 'progress');
+                onSnapshot(progRef, (snapshot) => {
+                    state.progress = {};
+                    snapshot.forEach(doc => {
+                        state.progress[doc.id] = doc.data();
+                    });
+                    renderDashboards();
+                }, (err) => console.error(err));
+            }
+
+            // 3. Listen to Profiles (for Leaderboard)
+            const profRef = collection(db, 'artifacts', appId, 'public', 'data', 'profiles');
+            onSnapshot(profRef, (snapshot) => {
+                state.profilesList = [];
+                snapshot.forEach(doc => {
+                    const p = doc.data();
+                    if(p.role === 'student') state.profilesList.push(p);
+                });
+                state.profilesList.sort((a, b) => b.total_score - a.total_score);
+                renderLeaderboard();
+            }, (err) => console.error(err));
+
+            goHome();
+        };
+
+        const renderDashboards = () => {
+            if(state.profile.role === 'admin') {
+                renderAdminView();
+            } else {
+                renderStudentView();
+            }
+        };
+
+        const renderStudentView = () => {
+            const container = el('studentWeeksContainer');
+            const published = state.weeks.filter(w => w.is_published);
+
+            if(published.length === 0) {
+                el('studentEmptyMsg').classList.remove('hidden');
+                container.innerHTML = '';
+                return;
+            }
+            el('studentEmptyMsg').classList.add('hidden');
+
+            let html = '';
+            published.forEach(week => {
+                const wid = week.id;
+                const p = state.progress[wid] || { pre_test_done: false, post_test_done: false, pre_test_score: 0, post_test_score: 0, learned: false };
+
+                const preDone = p.pre_test_done;
+                const postDone = p.post_test_done;
+                // Feature: Unlock Post-test requires Pre-test done AND "Learned"
+                const canPost = preDone && p.learned && !postDone;
+
+                const preBtn = preDone ? `<span class="text-green-600 font-bold text-sm">✅ Done (${p.pre_test_score} pts)</span>` : `<button onclick="app.startQuiz('${wid}', 'pre')" class="w-full bg-[--denim-blue] hover:bg-blue-300 text-[--ink-black] py-2 rounded font-typewriter font-bold shadow text-sm">Start Pre-Test</button>`;
+                
+                const learnBtn = !preDone ? `<span class="text-gray-400 text-sm">🔒 Locked</span>` : (p.learned ? `<span class="text-green-600 font-bold text-sm">✅ Learned</span>` : `<button onclick="app.simulateLearn('${wid}')" class="w-full bg-[--pastel-yellow] hover:bg-yellow-300 text-yellow-900 py-2 rounded font-typewriter font-bold shadow text-sm">Simulate 5-Day Learn</button>`);
+
+                const postBtn = postDone ? `<span class="text-green-600 font-bold text-sm">✅ Done (${p.post_test_score} pts)</span>` : (canPost ? `<button onclick="app.startQuiz('${wid}', 'post')" class="w-full bg-[--soft-pink] hover:bg-pink-300 text-[--ink-black] py-2 rounded font-typewriter font-bold shadow text-sm">Start Post-Test</button>` : `<span class="text-gray-400 text-sm">🔒 Need Learning</span>`);
+
+                html += `
+                    <div class="torn-paper bg-white p-6 relative shadow-md">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="bg-[--ink-black] text-white px-3 py-1 rounded font-typewriter text-xs font-bold shadow">WEEK ${wid}</span>
+                            <h2 class="font-handwriting text-3xl font-bold text-[--navy-blue]">${week.title}</h2>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3">
+                            <div class="border border-gray-200 p-3 rounded bg-gray-50 text-center">
+                                <h3 class="font-bold text-xs mb-2">1. Pre-Test</h3>
+                                ${preBtn}
+                            </div>
+                            <div class="border border-gray-200 p-3 rounded bg-gray-50 text-center">
+                                <h3 class="font-bold text-xs mb-2">2. Learn</h3>
+                                ${learnBtn}
+                            </div>
+                            <div class="border border-gray-200 p-3 rounded bg-gray-50 text-center">
+                                <h3 class="font-bold text-xs mb-2">3. Post-Test</h3>
+                                ${postBtn}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        };
+
+        const simulateLearn = async (wid) => {
+            const progRef = doc(db, 'artifacts', appId, 'users', state.userId, 'progress', wid);
+            await setDoc(progRef, { learned: true, week_id: wid }, { merge: true });
+            showModal("Good Job! 🎉", "Simulated 5-day learning completed. You can now take the Post-Test.");
+        };
+
+        const renderAdminView = () => {
+            const container = el('adminWeeksContainer');
+            if(state.weeks.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 font-typewriter">No weeks created yet.</p>';
+                return;
+            }
+
+            let html = '';
+            state.weeks.forEach(week => {
+                const statusBadge = week.is_published ? `<span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-bold">Published</span>` : `<span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded font-bold">Draft</span>`;
+                const toggleBtnTxt = week.is_published ? 'Unpublish' : 'Publish';
+                const preTestCount = week.pre_test_count || 0;
+                
+                html += `
+                    <div class="border-2 border-gray-200 p-4 rounded-lg bg-white flex justify-between items-center shadow-sm">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-bold font-typewriter">Week ${week.id}</span>
+                                ${statusBadge}
+                                <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded font-bold ml-2">👥 Pre-Test Count: ${preTestCount}</span>
+                            </div>
+                            <h3 class="font-bold text-lg text-[--navy-blue]">${week.title}</h3>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="app.editWeek('${week.id}')" class="bg-yellow-50 hover:bg-yellow-100 text-yellow-700 px-3 py-1 rounded font-bold text-sm transition border border-yellow-200">
+                                Edit
+                            </button>
+                            <button onclick="app.togglePublish('${week.id}', ${!week.is_published})" class="bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-1 rounded font-bold text-sm transition border border-gray-300">
+                                ${toggleBtnTxt}
+                            </button>
+                            <button onclick="app.confirmDelete('${week.id}')" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1 rounded font-bold text-sm transition border border-red-200">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        };
+
+        const renderLeaderboard = () => {
+            const tbody = el('leaderboardBody');
+            if(state.profilesList.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center p-8 font-typewriter text-gray-500">No data yet.</td></tr>`;
+                return;
+            }
+
+            let html = '';
+            state.profilesList.slice(0, 50).forEach((p, index) => {
+                const rank = index + 1;
+                let rankIcon = rank;
+                if(rank === 1) rankIcon = '🥇 S Tier';
+                else if(rank === 2) rankIcon = '🥈 A Tier';
+                else if(rank === 3) rankIcon = '🥉 B Tier';
+                
+                const isMe = p.uid === state.userId;
+                const rowClass = isMe ? 'bg-yellow-50 border-l-4 border-[--soft-pink]' : 'hover:bg-gray-50 border-b border-gray-100';
+
+                html += `
+                    <tr class="${rowClass} transition">
+                        <td class="p-4 font-bold text-gray-600 text-center">${rankIcon}</td>
+                        <td class="p-4 font-typewriter text-lg">${p.nickname} ${isMe ? '(You)' : ''}</td>
+                        <td class="p-4 text-right font-bold text-[--sage-green] text-xl">${p.total_score || 0} pts</td>
+                    </tr>
+                `;
+            });
+            tbody.innerHTML = html;
+        };
+
+        const adminCreateWeek = async () => {
+            const widInput = el('adminWeekNum').value;
+            const titleInput = el('adminWeekTitle').value;
+            
+            if(!widInput || !titleInput) return showModal("Error", "Please fill all fields.");
+
+            // Demo Questions (must be stringified for Firestore to avoid nested array issues)
+            const demoQuestions = JSON.stringify([
+                { q: "What does 'Stan' mean?", opts: ["Fan", "Hater", "Shoe"], ans: 0 },
+                { q: "US: Sneakers, UK: ______", opts: ["Trainers", "Boots", "Jumpers"], ans: 0 }
+            ]);
+
+            const weekData = {
+                id: parseInt(widInput),
+                title: titleInput,
+                is_published: state.editWeekId ? (state.weeks.find(w => w.id == widInput)?.is_published || false) : false,
+                pre_test: demoQuestions,
+                post_test: demoQuestions,
+                pre_test_count: state.editWeekId ? (state.weeks.find(w => w.id == widInput)?.pre_test_count || 0) : 0
+            };
+
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'weeks', widInput);
+            await setDoc(docRef, weekData, { merge: true });
+            
+            app.cancelEdit();
+            showModal("Success", `Draft for Week ${widInput} saved!`);
+        };
+
+        const editWeek = (wid) => {
+            const week = state.weeks.find(w => String(w.id) === String(wid));
+            if(!week) return;
+            state.editWeekId = wid;
+            el('adminFormTitle').innerText = `Edit Week ${wid}`;
+            el('adminWeekNum').value = week.id;
+            el('adminWeekNum').disabled = true; // Prevent changing ID
+            el('adminWeekTitle').value = week.title;
+            el('adminSubmitBtn').innerText = "💾 Save Changes";
+            el('adminCancelBtn').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        const cancelEdit = () => {
+            state.editWeekId = null;
+            el('adminFormTitle').innerText = `Create New Week`;
+            el('adminWeekNum').value = '';
+            el('adminWeekNum').disabled = false;
+            el('adminWeekTitle').value = '';
+            el('adminSubmitBtn').innerText = "➕ Add Draft";
+            el('adminCancelBtn').classList.add('hidden');
+        };
+
+        const togglePublish = async (wid, isPub) => {
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'weeks', wid);
+            await updateDoc(docRef, { is_published: isPub });
+        };
+
+        const confirmDelete = (wid) => {
+            showModal("Confirm Delete", `Are you sure you want to delete Week ${wid}?`, true, async () => {
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'weeks', wid);
+                await deleteDoc(docRef);
+            });
+        };
+
+        const exportCSV = () => {
+            let csv = "Rank,Nickname,TotalScore\n";
+            state.profilesList.forEach((p, i) => {
+                csv += `${i+1},${p.nickname},${p.total_score}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "krunor_scores.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        const startQuiz = async (wid, type) => {
+            const week = state.weeks.find(w => String(w.id) === String(wid));
+            if(!week) return;
+
+            const qList = type === 'pre' ? week.pre_test : week.post_test;
+            if(!qList || qList.length === 0) return showModal("Error", "No questions.");
+
+            // Data Persistence: Load Checkpoint if exists
+            let savedAnswers = new Array(qList.length).fill(null);
+            const p = state.progress[wid];
+            if(p && p[`${type}_temp_answers`]) {
+                savedAnswers = p[`${type}_temp_answers`];
+            }
+
+            state.quiz = {
+                wid: wid,
+                type: type,
+                questions: qList,
+                idx: 0,
+                answers: savedAnswers
+            };
+
+            el('quizTitle').innerText = `${type === 'pre' ? 'Pre-Test' : 'Post-Test'}: Wk ${wid}`;
+            switchView('viewQuiz');
+            renderQuizQ();
+        };
+
+        const renderQuizQ = () => {
+            const qData = state.quiz;
+            const q = qData.questions[qData.idx];
+            el('quizProgress').innerText = `${qData.idx + 1}/${qData.questions.length}`;
+            
+            let optsHtml = '';
+            q.opts.forEach((opt, i) => {
+                const sel = qData.answers[qData.idx] === i;
+                optsHtml += `
+                    <label class="flex items-center p-4 mb-3 border-2 ${sel ? 'border-[--navy-blue] bg-blue-50' : 'border-gray-200 bg-white'} rounded cursor-pointer transition">
+                        <input type="radio" name="qopt" onchange="app.selAns(${i})" ${sel ? 'checked' : ''} class="hidden">
+                        <div class="w-5 h-5 rounded-full border-2 border-gray-400 mr-3 flex items-center justify-center ${sel ? 'border-[--navy-blue] bg-[--navy-blue]' : ''}">
+                            ${sel ? '<div class="w-2 h-2 bg-white rounded-full"></div>' : ''}
+                        </div>
+                        <span class="font-inter text-gray-800">${opt}</span>
+                    </label>
+                `;
+            });
+
+            el('quizContent').innerHTML = `
+                <h3 class="font-bold text-xl mb-6 text-[--navy-blue]">${q.q}</h3>
+                ${optsHtml}
+            `;
+            
+            const btn = el('submitQuizBtn');
+            if(qData.answers[qData.idx] !== null) {
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btn.innerText = (qData.idx === qData.questions.length - 1) ? "Submit ✨" : "Next ➔";
+            } else {
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+                btn.innerText = "Next ➔";
+            }
+        };
+
+        const selAns = async (i) => {
+            state.quiz.answers[state.quiz.idx] = i;
+            renderQuizQ();
+
+            // Data Persistence: Auto-save checkpoint to cloud
+            const progRef = doc(db, 'artifacts', appId, 'users', state.userId, 'progress', state.quiz.wid);
+            const updateObj = { week_id: state.quiz.wid };
+            updateObj[`${state.quiz.type}_temp_answers`] = state.quiz.answers;
+            await setDoc(progRef, updateObj, { merge: true });
+        };
+
+        const submitQuiz = async () => {
+            const qData = state.quiz;
+            if(qData.answers[qData.idx] === null) return;
+
+            if(qData.idx < qData.questions.length - 1) {
+                qData.idx++;
+                renderQuizQ();
+                return;
+            }
+
+            // Calculate
+            let score = 0;
+            qData.questions.forEach((q, i) => { if(qData.answers[i] === q.ans) score += 10; });
+
+            const isPre = qData.type === 'pre';
+            const progRef = doc(db, 'artifacts', appId, 'users', state.userId, 'progress', qData.wid);
+            
+            const updateObj = { week_id: qData.wid };
+            updateObj[`${qData.type}_temp_answers`] = null; // Clear checkpoint after submit
+
+            if(isPre) {
+                updateObj.pre_test_done = true;
+                updateObj.pre_test_score = score;
+            } else {
+                updateObj.post_test_done = true;
+                updateObj.post_test_score = score;
+            }
+
+            // Update Progress
+            await setDoc(progRef, updateObj, { merge: true });
+
+            // Admin Stats: Update Pre-Test Count for Dashboard
+            if (isPre) {
+                const weekRef = doc(db, 'artifacts', appId, 'public', 'data', 'weeks', qData.wid);
+                const weekData = state.weeks.find(w => String(w.id) === String(qData.wid));
+                const currentCount = weekData.pre_test_count || 0;
+                await updateDoc(weekRef, { pre_test_count: currentCount + 1 });
+            }
+
+            // Update Total Score if Post-test
+            if(!isPre) {
+                const newTotal = state.profile.total_score + score;
+                const profRef = doc(db, 'artifacts', appId, 'public', 'data', 'profiles', state.userId);
+                await updateDoc(profRef, { total_score: newTotal });
+                showModal("Amazing! 🎉", `You scored ${score} pts! Ranked updated.`);
+            } else {
+                showModal("Pre-Test Done! 📝", `You scored ${score} pts. Check LINE for daily vocabs!`);
+            }
+
+            goHome();
+        };
+
+        // Window Exports
+        window.app = {
+            switchView, saveNickname, goHome,
+            adminCreateWeek, editWeek, cancelEdit, togglePublish, confirmDelete, exportCSV,
+            simulateLearn, startQuiz, selAns, submitQuiz,
+            closeModal
+        };
+
+        // Boot
+        window.onload = initApp;
+
+    </script>
+</body>
+</html>
